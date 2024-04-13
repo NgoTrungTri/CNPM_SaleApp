@@ -44,4 +44,5 @@ def common_atributes():
 
 if __name__ == '__main__':
     with app.app_context():
+        from saleapp import admin
         app.run(debug=True)

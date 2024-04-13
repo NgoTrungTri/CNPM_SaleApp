@@ -1,30 +1,38 @@
-import json
+from saleapp.models import Category, Product
+from saleapp import app
 
 def load_Categories():
-    with open('data/categories.json', encoding='utf-8') as f:
-        return json.load(f)
+    return Category.query.all()
 
 
-def load_Products(q=None, cate_id=None):
-    with open('data/products.json', encoding='utf-8') as f:
-        products = json.load(f)
+def load_Products(q=None, cate_id=None, page=None):
+    query = Product.query
 
     if q:
-        products = [p for p in products if p['name'].find(q) >= 0]
+        query = query.filter(Product.name.contains(q))
 
     if cate_id:
-        products = [p for p in products if p['category_id'].__eq__(int(cate_id))]
+        query = query.filter(Product.category_id.__eq__(cate_id))
 
-    return products
+    if page:
+        page_size = app.config['PAGE_SIZE']
+
+        start = (int(page)-1) * page_size
+        return query.slice(start, start+page_size)
+    else:
+        return query.all()
 
 
-def get_product_by_id(product_id):
-    with open('data/products.json', encoding='utf-8') as f:
-        products = json.load(f)
+def count_product():
+    return Product.query.count();
 
-        for p in products:
-            if p['id'] == product_id:
-                return p
+# def get_product_by_id(product_id):
+    # with open('data/products.json', encoding='utf-8') as f:
+    #     products = json.load(f)
+    #
+    #     for p in products:
+    #         if p['id'] == product_id:
+    #             return p
 
 
 if __name__ == '__main__':
